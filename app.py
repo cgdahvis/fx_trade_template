@@ -38,12 +38,20 @@ else:
         net_delta = st.number_input('Net Delta (%)', min_value=0.0, format='%f')
     else:
         net_delta = None
-    
+
     # Handle button click
-    if st.button('Generate Trade Idea'):
-        strikes_text = ' / '.join(map(str, strikes))
-        if net_delta is not None:
-            trade_idea = f"{currency_pair}\n\n{action} {date} {strikes_text} {option_type}{f' {strikes[-1]}' if 'RKI' in option_type or 'ERKO' in option_type else ''}\nCosts ~ {cost} {cost_unit} / Net Delta {net_delta}%\n{leverage:.1f}x Leverage"
-        else:
-            trade_idea = f"{currency_pair}\n\n{action} {date} {strikes_text} {option_type}{f' {strikes[-1]}' if 'RKI' in option_type or 'ERKO' in option_type else ''}\nCosts ~ {cost} {cost_unit}\n{leverage:.1f}x Leverage"
-        st.text(trade_idea)
+if st.button('Generate Trade Idea'):
+    # Formatting strikes
+    strikes_text = ' / '.join(map(str, strikes))
+    
+    # Constructing trade idea using HTML tags
+    trade_idea_html = f"""
+    <p style="line-height:1.0;">
+        {currency_pair}<br>
+        {action} {date} {strikes_text} {option_type}{f' {strikes[-1]}' if 'RKI' in option_type or 'ERKO' in option_type else ''}<br>
+        <strong>Costs ~ {cost} {cost_unit}</strong>{f' / Net Delta {net_delta}%' if net_delta is not None else ''}<br>
+        <strong>{leverage:.1f}x Leverage</strong>
+    </p>
+    """
+    st.markdown(trade_idea_html, unsafe_allow_html=True)
+
