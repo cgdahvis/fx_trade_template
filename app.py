@@ -17,10 +17,7 @@ with col3:
     action = st.selectbox('Action', ['Buy', 'Sell'])
 
 # Validate date
-if date.lower() not in ['1m', '3m'] and not re.match(r'\d{2}-\w{3}-\d{4}', date):
-    st.error('Please enter a valid date or one of the allowed strings: "1m", "3m"')
-else:
-    option_type = st.selectbox('Option Type', ['call spread', 'put spread', 'call spread RKI', 'put spread RKI', 'digital', 'call ERKO', 'put ERKO'])
+option_type = st.selectbox('Option Type', ['call spread', 'put spread', 'call spread RKI', 'put spread RKI', 'digital', 'call ERKO', 'put ERKO'])
 
 # Number of strike inputs based on option type
 num_strikes = {"call spread": 2, "put spread": 2, "call spread RKI": 3, "put spread RKI": 3, "digital": 1, "call ERKO": 2, "put ERKO": 2}.get(option_type, 0)
