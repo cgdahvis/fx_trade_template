@@ -1,8 +1,19 @@
 import streamlit as st
 import pandas as pd
 
-# Create an empty DataFrame to store the data for FX Derivative Order Tracker
-order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+# Function to save orders to a CSV file
+def save_orders(order_data):
+    order_data.to_csv("orders.csv", index=False)
+
+# Function to load orders from a CSV file
+def load_orders():
+    try:
+        return pd.read_csv("orders.csv")
+    except FileNotFoundError:
+        return pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+
+# Load orders from the CSV file when the app starts
+order_data = load_orders()
 
 # Set title
 st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -89,11 +100,14 @@ if st.sidebar.button("Add Order"):
     order_data = pd.concat([order_data, pd.DataFrame([new_row])], ignore_index=True)
     st.sidebar.success("Order Added!")
 
+    # Save orders to the CSV file
+    save_orders(order_data)
+
 # Display the orders in a table
 st.header("Current Orders")
 st.dataframe(order_data)
 
 # Allow users to delete orders
-if st.sidebar.button("Clear Orders"):
+if st.button("Clear Orders"):
     order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
     st.success("All Orders Cleared!")
