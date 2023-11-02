@@ -117,7 +117,7 @@ if st.button("Remove Selected Order"):
     st.success(f"Order for {order_to_remove} Removed!")
 
 # Allow users to delete all orders
-if st.button("Clear Orders"):
-    order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
-    save_orders(order_data)
-    st.success("All Orders Cleared!")
+# if st.button("Clear Orders"):
+#     order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+#     save_orders(order_data)
+#     st.success("All Orders Cleared!")
