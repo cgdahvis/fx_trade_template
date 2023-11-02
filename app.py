@@ -103,11 +103,17 @@ if st.sidebar.button("Add Order"):
     # Save orders to the CSV file
     save_orders(order_data)
 
-# Display the orders in a table
+# Display the orders in a table with buttons to remove specific orders
 st.header("Current Orders")
-st.table(order_data)
+for idx, row in order_data.iterrows():
+    st.write(f"Order {idx + 1}:", row)
+    if st.button(f"Remove Order {idx + 1}"):
+        order_data.drop(idx, inplace=True)
+        order_data.reset_index(drop=True, inplace=True)
+        st.success(f"Order {idx + 1} Removed!")
 
-# Allow users to delete orders
+# Allow users to delete all orders
 if st.button("Clear Orders"):
     order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
     st.success("All Orders Cleared!")
+    st.experimental_rerun()  # Reload the app to clear the buttons
