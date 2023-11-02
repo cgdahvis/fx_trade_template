@@ -24,7 +24,7 @@ col1, col2, col3 = st.columns([1,1,1])
 
 # Widgets in Top Row
 with col1:
-    currency_pair = st.selectbox('Currency Pair', ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
+    currency_pair = st.selectbox('Currency Pair', ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY","EURGBP", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
 with col2:
     date = st.text_input('Date', value='1m')
 with col3:
@@ -88,7 +88,7 @@ if st.button('Generate Trade Idea'):
 # Sidebar for data entry
 st.sidebar.header("FX Derivative Order Tracker")
 client_name = st.sidebar.text_input("Client Name")
-ccy_pair = st.sidebar.selectbox("Currency Pair", ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CHF"])
+ccy_pair = st.sidebar.selectbox("Currency Pair", ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
 structure = st.sidebar.text_input("Structure")
 liquidity_provider = st.sidebar.text_input("Liquidity Provider")
 level = st.sidebar.number_input("Level Working with LP", min_value=0)
