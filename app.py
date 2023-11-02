@@ -91,7 +91,7 @@ client_name = st.sidebar.text_input("Client Name")
 ccy_pair = st.sidebar.selectbox("Currency Pair", ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CHF"])
 structure = st.sidebar.text_input("Structure")
 liquidity_provider = st.sidebar.text_input("Liquidity Provider")
-level = st.sidebar.number_input("Level", min_value=0)
+level = st.sidebar.number_input("Level Working with LP", min_value=0)
 client_fill_level = st.sidebar.number_input("Client Fill Level", min_value=0)
 
 if st.sidebar.button("Add Order"):
