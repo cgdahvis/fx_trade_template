@@ -2,14 +2,14 @@ import streamlit as st
 import pandas as pd
 
 # Create an empty DataFrame to store the data for FX Derivative Order Tracker
-data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
 
 # Set title
 st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
 st.title('Trade Idea Generator')
 
 # Create columns for input widgets
-col1, col2, col3 = st.columns([1,1,1])
+col1, col2, col3 = st.columns([1, 1, 1])
 
 # Widgets in Top Row
 with col1:
@@ -84,16 +84,16 @@ level = st.sidebar.number_input("Level", min_value=0)
 client_fill_level = st.sidebar.number_input("Client Fill Level", min_value=0)
 
 if st.sidebar.button("Add Order"):
-    data = data.append({'Client Name': client_name, 'CCY Pair': ccy_pair, 'Structure': structure,
-                        'Liquidity Provider': liquidity_provider, 'Level': level, 'Client Fill Level': client_fill_level},
-                        ignore_index=True)
+    new_row = {'Client Name': client_name, 'CCY Pair': ccy_pair, 'Structure': structure,
+               'Liquidity Provider': liquidity_provider, 'Level': level, 'Client Fill Level': client_fill_level}
+    order_data = order_data.append(new_row, ignore_index=True)
     st.sidebar.success("Order Added!")
 
 # Display the orders in a table
 st.header("Current Orders")
-st.dataframe(data)
+st.dataframe(order_data)
 
 # Allow users to delete orders
 if st.sidebar.button("Clear Orders"):
-    data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+    order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
     st.success("All Orders Cleared!")
