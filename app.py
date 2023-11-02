@@ -9,7 +9,7 @@ st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upw
 st.title('Trade Idea Generator')
 
 # Create columns for input widgets
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3 = st.columns([1,1,1])
 
 # Widgets in Top Row
 with col1:
@@ -47,7 +47,7 @@ else:
         leverage = round((abs(strikes[2] - strikes[0]) / strikes[0]) / (cost / 10000), 1) if cost != 0 else 0
     elif option_type in ['call ERKO', 'put ERKO']:
         leverage = round((abs(strikes[1] - strikes[0]) / strikes[0]) / (cost / 10000), 1) if cost != 0 else 0
-    
+
 # Conditional input for Net Delta
 if option_type != 'digital':
     net_delta = st.number_input('Net Delta (%)', min_value=0.0, format='%f')
@@ -62,7 +62,7 @@ if st.button('Generate Trade Idea'):
         strikes_text = ' / '.join(map(str, strikes[:-1]))
     else:
         strikes_text = ' / '.join(map(str, strikes))
-    
+
     # Constructing trade idea using HTML tags
     trade_idea_html = f"""
     <p style="line-height:1.0;">
@@ -86,7 +86,7 @@ client_fill_level = st.sidebar.number_input("Client Fill Level", min_value=0)
 if st.sidebar.button("Add Order"):
     new_row = {'Client Name': client_name, 'CCY Pair': ccy_pair, 'Structure': structure,
                'Liquidity Provider': liquidity_provider, 'Level': level, 'Client Fill Level': client_fill_level}
-    order_data = order_data.append(new_row, ignore_index=True)
+    order_data = pd.concat([order_data, pd.DataFrame([new_row])], ignore_index=True)
     st.sidebar.success("Order Added!")
 
 # Display the orders in a table
