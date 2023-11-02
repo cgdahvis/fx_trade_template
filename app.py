@@ -103,29 +103,22 @@ if st.sidebar.button("Add Order"):
     # Save orders to the CSV file
     save_orders(order_data)
 
-# Display the orders in a table
+# Display the orders in a cleaner format
 st.header("Current Orders")
 
-# Allow users to delete orders
 for idx, order in order_data.iterrows():
-    delete_order = st.button(f"Delete Order {idx + 1}")
-    if delete_order:
-        order_data = order_data.drop(index=idx)
-        st.success(f"Order {idx + 1} Deleted!")
-        # Save orders to the CSV file after deleting
-        save_orders(order_data)
+    with st.expander(f"Order {idx + 1}"):
+        st.write("Client Name:", order['Client Name'])
+        st.write("Currency Pair:", order['CCY Pair'])
+        st.write("Structure:", order['Structure'])
+        st.write("Liquidity Provider:", order['Liquidity Provider'])
+        st.write("Level Working with LP:", order['Level'])
+        st.write("Client Fill Level:", order['Client Fill Level'])
 
-    col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 1, 1, 1, 1])
-    
-    with col1:
-        st.write(order['Client Name'])
-    with col2:
-        st.write(order['CCY Pair'])
-    with col3:
-        st.write(order['Structure'])
-    with col4:
-        st.write(order['Liquidity Provider'])
-    with col5:
-        st.write(order['Level'])
-    with col6:
-        st.write(order['Client Fill Level'])
+        # Delete button for each order
+        delete_order = st.button(f"Delete Order {idx + 1}")
+        if delete_order:
+            order_data = order_data.drop(index=idx)
+            st.success(f"Order {idx + 1} Deleted!")
+            # Save orders to the CSV file after deleting
+            save_orders(order_data)
