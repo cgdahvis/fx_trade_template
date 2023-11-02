@@ -90,6 +90,3 @@ if not data.empty:
 # Prevent clearing all orders to avoid accidents
 if not data.empty:
     st.info("To delete specific orders, select an order from the dropdown and click 'Delete Order'.")
-
-# Save orders to the CSV file (optional)
-# data.to_csv("orders.csv", index=False)
