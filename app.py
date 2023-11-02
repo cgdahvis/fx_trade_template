@@ -105,9 +105,14 @@ if st.sidebar.button("Add Order"):
 
 # Display the orders in a table
 st.header("Current Orders")
-st.dataframe(order_data)
 
 # Allow users to delete orders
-if st.button("Clear Orders"):
-    order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
-    st.success("All Orders Cleared!")
+for idx, order in order_data.iterrows():
+    delete_order = st.button(f"Delete Order {idx + 1}")
+    if delete_order:
+        order_data = order_data.drop(index=idx)
+        st.success(f"Order {idx + 1} Deleted!")
+
+# Display the updated order data
+st.dataframe(order_data)
+
