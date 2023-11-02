@@ -72,6 +72,14 @@ if st.button('Generate Trade Idea'):
     """
     st.markdown(trade_idea_html, unsafe_allow_html=True)
 
+#for adding the tracking live order functionality
+# Create an empty DataFrame to store the data for FX Derivative Order Tracker
+data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+
+# Set title
+st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
+st.title('Trade Idea Generator')
+
 # Create a navigation menu
 menu_option = st.sidebar.radio("Navigation Menu", ["Trade Idea Generator", "FX Derivative Order Tracker"])
 
