@@ -105,7 +105,7 @@ if st.sidebar.button("Add Order"):
 
 # Display the orders in a table
 st.header("Current Orders")
-st.dataframe(order_data)
+st.table(order_data)
 
 # Allow users to delete orders
 if st.button("Clear Orders"):
