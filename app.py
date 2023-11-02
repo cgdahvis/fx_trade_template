@@ -108,14 +108,15 @@ st.header("Current Orders")
 
 # Allow users to delete orders
 for idx, order in order_data.iterrows():
-    col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 1, 1, 1, 1])
-    delete_order = col6.button(f"Delete Order {idx + 1}")
+    delete_order = st.button(f"Delete Order {idx + 1}")
     if delete_order:
         order_data = order_data.drop(index=idx)
         st.success(f"Order {idx + 1} Deleted!")
         # Save orders to the CSV file after deleting
         save_orders(order_data)
 
+    col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 1, 1, 1, 1])
+    
     with col1:
         st.write(order['Client Name'])
     with col2:
@@ -128,5 +129,3 @@ for idx, order in order_data.iterrows():
         st.write(order['Level'])
     with col6:
         st.write(order['Client Fill Level'])
-
-# Display the updated order data
