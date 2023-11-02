@@ -117,3 +117,4 @@ if st.button("Clear Orders"):
     order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
     st.success("All Orders Cleared!")
     st.experimental_rerun()  # Reload the app to clear the buttons
+ 
