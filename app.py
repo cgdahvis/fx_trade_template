@@ -74,34 +74,26 @@ if st.button('Generate Trade Idea'):
     """
     st.markdown(trade_idea_html, unsafe_allow_html=True)
 
-# Display the FX Derivative Order Tracker in a separate tab
-menu_option = st.sidebar.radio("Navigation Menu", ["Trade Idea Generator", "FX Derivative Order Tracker"])
+# Sidebar for data entry
+st.sidebar.header("FX Derivative Order Tracker")
+client_name = st.sidebar.text_input("Client Name")
+ccy_pair = st.sidebar.selectbox("Currency Pair", ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CHF"])
+structure = st.sidebar.text_input("Structure")
+liquidity_provider = st.sidebar.text_input("Liquidity Provider")
+level = st.sidebar.number_input("Level", min_value=0)
+client_fill_level = st.sidebar.number_input("Client Fill Level", min_value=0)
 
-if menu_option == "Trade Idea Generator":
-    pass
-elif menu_option == "FX Derivative Order Tracker":
-    st.header("FX Derivative Order Tracker")
+if st.sidebar.button("Add Order"):
+    data = data.append({'Client Name': client_name, 'CCY Pair': ccy_pair, 'Structure': structure,
+                        'Liquidity Provider': liquidity_provider, 'Level': level, 'Client Fill Level': client_fill_level},
+                        ignore_index=True)
+    st.sidebar.success("Order Added!")
 
-    # Sidebar for data entry
-    st.sidebar.header("Add Order")
-    client_name = st.sidebar.text_input("Client Name")
-    ccy_pair = st.sidebar.selectbox("Currency Pair", ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CHF"])
-    structure = st.sidebar.text_input("Structure")
-    liquidity_provider = st.sidebar.text_input("Liquidity Provider")
-    level = st.sidebar.number_input("Level", min_value=0)
-    client_fill_level = st.sidebar.number_input("Client Fill Level", min_value=0)
+# Display the orders in a table
+st.header("Current Orders")
+st.dataframe(data)
 
-    if st.sidebar.button("Add Order"):
-        data = data.append({'Client Name': client_name, 'CCY Pair': ccy_pair, 'Structure': structure,
-                            'Liquidity Provider': liquidity_provider, 'Level': level, 'Client Fill Level': client_fill_level},
-                           ignore_index=True)
-        st.sidebar.success("Order Added!")
-
-    # Display the orders in a table
-    st.header("Current Orders")
-    st.dataframe(data)
-
-    # Allow users to delete orders
-    if st.button("Clear Orders"):
-        data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
-        st.success("All Orders Cleared!")
+# Allow users to delete orders
+if st.sidebar.button("Clear Orders"):
+    data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+    st.success("All Orders Cleared!")
