@@ -1,19 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-# Function to save orders to a CSV file
-def save_orders(order_data):
-    order_data.to_csv("orders.csv", index=False)
-
-# Function to load orders from a CSV file
-def load_orders():
-    try:
-        return pd.read_csv("orders.csv")
-    except FileNotFoundError:
-        return pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
-
-# Load orders from the CSV file when the app starts
-order_data = load_orders()
+# Create an empty DataFrame to store the data for FX Derivative Order Tracker
+data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
 
 # Set title
 st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -88,15 +77,19 @@ if st.button('Generate Trade Idea'):
 # Display the existing orders in a table
 st.header("Existing Orders")
 
-if not order_data.empty:
-    st.dataframe(order_data)
+if not data.empty:
+    st.dataframe(data)
 
 # Allow users to delete specific orders one at a time
-if not order_data.empty:
-    delete_order_idx = st.selectbox("Select an order to delete:", order_data.index)
+if not data.empty:
+    delete_order_idx = st.selectbox("Select an order to delete:", data.index)
     if st.button("Delete Order"):
-        order_data = order_data.drop(delete_order_idx)
+        data = data.drop(delete_order_idx)
         st.success("Order Deleted!")
 
-# Save orders to the CSV file
-save_orders(order_data)
+# Prevent clearing all orders to avoid accidents
+if not data.empty:
+    st.info("To delete specific orders, select an order from the dropdown and click 'Delete Order'.")
+
+# Save orders to the CSV file (optional)
+# data.to_csv("orders.csv", index=False)
