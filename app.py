@@ -1,8 +1,19 @@
 import streamlit as st
 import pandas as pd
 
-# Create an empty DataFrame to store the data for FX Derivative Order Tracker
-data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+# Function to save orders to a CSV file
+def save_orders(order_data):
+    order_data.to_csv("orders.csv", index=False)
+
+# Function to load orders from a CSV file
+def load_orders():
+    try:
+        return pd.read_csv("orders.csv")
+    except FileNotFoundError:
+        return pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+
+# Load orders from the CSV file when the app starts
+order_data = load_orders()
 
 # Set title
 st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -13,7 +24,7 @@ col1, col2, col3 = st.columns([1,1,1])
 
 # Widgets in Top Row
 with col1:
-    currency_pair = st.selectbox('Currency Pair', ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
+    currency_pair = st.selectbox('Currency Pair', ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY","EURGBP", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
 with col2:
     date = st.text_input('Date', value='1m')
 with col3:
@@ -74,19 +85,29 @@ if st.button('Generate Trade Idea'):
     """
     st.markdown(trade_idea_html, unsafe_allow_html=True)
 
-# Display the existing orders in a table
-st.header("Existing Orders")
+# Sidebar for data entry
+st.sidebar.header("FX Derivative Order Tracker")
+client_name = st.sidebar.text_input("Client Name")
+ccy_pair = st.sidebar.selectbox("Currency Pair", ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
+structure = st.sidebar.text_input("Structure")
+liquidity_provider = st.sidebar.text_input("Liquidity Provider")
+level = st.sidebar.number_input("Level Working with LP", min_value=0)
+client_fill_level = st.sidebar.number_input("Client Fill Level", min_value=0)
 
-if not data.empty:
-    st.dataframe(data)
+if st.sidebar.button("Add Order"):
+    new_row = {'Client Name': client_name, 'CCY Pair': ccy_pair, 'Structure': structure,
+               'Liquidity Provider': liquidity_provider, 'Level': level, 'Client Fill Level': client_fill_level}
+    order_data = pd.concat([order_data, pd.DataFrame([new_row])], ignore_index=True)
+    st.sidebar.success("Order Added!")
 
-# Allow users to delete specific orders one at a time
-if not data.empty:
-    delete_order_idx = st.selectbox("Select an order to delete:", data.index)
-    if st.button("Delete Order"):
-        data = data.drop(delete_order_idx)
-        st.success("Order Deleted!")
+    # Save orders to the CSV file
+    save_orders(order_data)
 
-# Prevent clearing all orders to avoid accidents
-if not data.empty:
-    st.info("To delete specific orders, select an order from the dropdown and click 'Delete Order'.")
+# Display the orders in a table
+st.header("Current Orders")
+st.dataframe(order_data)
+
+# Allow users to delete orders
+if st.button("Clear Orders"):
+    order_data = pd.DataFrame(columns=['Client Name', 'CCY Pair', 'Structure', 'Liquidity Provider', 'Level', 'Client Fill Level'])
+    st.success("All Orders Cleared!")
