@@ -115,4 +115,3 @@ if st.button("Remove Selected Order"):
     order_data = order_data[order_data['Client Name'] != order_to_remove]
     save_orders(order_data)
     st.success(f"Order for {order_to_remove} Removed!")
-
