@@ -31,16 +31,16 @@ with col3:
     action = st.selectbox('Action', ['Buy', 'Sell'])
 
 # Validate date
-option_type = st.selectbox('Option Type', ['call spread', 'put spread', 'call spread RKI', 'put spread RKI', 'digital', 'call ERKO', 'put ERKO'])
+option_type = st.selectbox('Option Type', ['call spread', 'put spread', 'call spread RKI', 'put spread RKI', 'digital', 'call ERKO', 'put ERKO', 'digi risk reversal'])
 
 # Number of strike inputs based on option type
-num_strikes = {"call spread": 2, "put spread": 2, "call spread RKI": 3, "put spread RKI": 3, "digital": 1, "call ERKO": 2, "put ERKO": 2}.get(option_type, 0)
+num_strikes = {"call spread": 2, "put spread": 2, "call spread RKI": 3, "put spread RKI": 3, "digital": 1, "call ERKO": 2, "put ERKO": 2, 'digi risk reversal': 3}.get(option_type, 0)
 
 # Create a new row of columns for strikes
 col_strike1, col_strike2, col_strike3 = st.columns([1,1,1])
 strikes = []
 for i in range(num_strikes):
-    label = f'ERKO' if (option_type in ['call ERKO', 'put ERKO'] and i == 1) else f'RKI' if (option_type in ['call spread RKI', 'put spread RKI'] and i == 2) else f'Strike {i+1}'
+    label = f'ERKO' if (option_type in ['call ERKO', 'put ERKO', 'digi risk reversal'] and i == 1) else f'RKI' if (option_type in ['call spread RKI', 'put spread RKI', 'digi risk reversal'] and i >= 2) else f'Strike {i+1}'
     with eval(f'col_strike{i+1}'):
         strikes.append(st.number_input(label, format='%f'))
 
@@ -54,7 +54,7 @@ else:
     cost_unit = 'bps'
     if option_type in ['call spread', 'put spread']:
         leverage = round((abs(strikes[1] - strikes[0]) / strikes[0]) / (cost / 10000), 1) if cost != 0 else 0
-    elif option_type in ['call spread RKI', 'put spread RKI']:
+    elif option_type in ['call spread RKI', 'put spread RKI', 'digi risk reversal']:
         leverage = round((abs(strikes[2] - strikes[0]) / strikes[0]) / (cost / 10000), 1) if cost != 0 else 0
     elif option_type in ['call ERKO', 'put ERKO']:
         leverage = round((abs(strikes[1] - strikes[0]) / strikes[0]) / (cost / 10000), 1) if cost != 0 else 0
