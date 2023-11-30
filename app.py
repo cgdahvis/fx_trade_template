@@ -20,28 +20,28 @@ st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upw
 st.title('Trade Idea Generator')
 
 # Create columns for input widgets
-col1, col2, col3 = st.columns([1,1,1])
+col1, col2, col3 = st.columns([1, 1, 1])
 
 # Widgets in Top Row
 with col1:
-    currency_pair = st.selectbox('Currency Pair', ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY","EURGBP", "EURNOK" ,"AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
+    currency_pair = st.selectbox('Currency Pair', ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "EURGBP", "EURNOK", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN", "USDCNH", "USDTWD", "USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
 with col2:
     date = st.text_input('Date', value='1m')
 with col3:
     action = st.selectbox('Action', ['Buy', 'Sell'])
 
-# Validate date
+# Validate option type
 option_type = st.selectbox('Option Type', ['call spread', 'put spread', 'call spread RKI', 'put spread RKI', 'digital', 'call ERKO', 'put ERKO', 'digi risk reversal'])
 
 # Number of strike inputs based on option type
 num_strikes = {"call spread": 2, "put spread": 2, "call spread RKI": 3, "put spread RKI": 3, "digital": 1, "call ERKO": 2, "put ERKO": 2, 'digi risk reversal': 3}.get(option_type, 0)
 
 # Create a new row of columns for strikes
-col_strike1, col_strike2, col_strike3 = st.columns([1,1,1])
+col_strike1, col_strike2, col_strike3 = st.columns([1, 1, 1])
 strikes = []
 for i in range(num_strikes):
-    label = f'ERKO' if (option_type in ['call ERKO', 'put ERKO', 'digi risk reversal'] and i == 1) else f'RKI' if (option_type in ['call spread RKI', 'put spread RKI', 'digi risk reversal'] and i >= 2) else f'Strike {i+1}'
-    with eval(f'col_strike{i+1}'):
+    label = f'ERKO' if (option_type in ['call ERKO', 'put ERKO', 'digi risk reversal'] and i == 1) else f'RKI' if (option_type in ['call spread RKI', 'put spread RKI', 'digi risk reversal'] and i >= 2) else f'Strike {i + 1}'
+    with eval(f'col_strike{i + 1}'):
         strikes.append(st.number_input(label, format='%f'))
 
 # Conditional input for Cost with unit based on option type
@@ -67,10 +67,10 @@ else:
 
 if st.button('Generate Trade Idea'):
     # Formatting strikes
-    if option_type in ['call ERKO', 'put ERKO']:
+    if option_type in ['call ERKO', 'put ERKO', 'digi risk reversal']:
         strikes_text = f"{strikes[0]}"
-    elif option_type in ['call spread RKI', 'put spread RKI']:
-        strikes_text = ' / '.join(map(str, strikes[:-1]))
+    elif option_type in ['call spread RKI', 'put spread RKI', 'digi risk reversal']:
+        strikes_text = ' / '.join(map(str, strikes[2:]))
     else:
         strikes_text = ' / '.join(map(str, strikes))
 
@@ -88,7 +88,7 @@ if st.button('Generate Trade Idea'):
 # Sidebar for data entry
 st.sidebar.header("FX Derivative Order Tracker")
 client_name = st.sidebar.text_input("Client Name")
-ccy_pair = st.sidebar.selectbox("Currency Pair", ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN","USDCNH","USDTWD","USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
+ccy_pair = st.sidebar.selectbox("Currency Pair", ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURGBP", "EURJPY", "GBPJPY", "AUDJPY", "AUDNZD", "EURAUD", "CHFJPY", "USDSEK", "USDNOK", "USDMXN", "USDCNH", "USDTWD", "USDKRW", "USDSGD", "USDZAR", "USDTRY", "USDINR"])
 structure = st.sidebar.text_input("Structure")
 liquidity_provider = st.sidebar.text_input("Liquidity Provider")
 level = st.sidebar.number_input("Level Working with LP", min_value=0)
