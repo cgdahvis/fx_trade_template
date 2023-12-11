@@ -65,12 +65,14 @@ if option_type != 'digital':
 else:
     net_delta = None
 
+# Inside the 'Generate Trade Idea' button block
 if st.button('Generate Trade Idea'):
     # Formatting strikes
     if option_type in ['call ERKO', 'put ERKO', 'digi risk reversal']:
         strikes_text = f"{strikes[0]}"
     elif option_type in ['call spread RKI', 'put spread RKI', 'digi risk reversal']:
-        strikes_text = ' / '.join(map(str, strikes[2:]))
+        # Include the additional strike in the text
+        strikes_text = f"{strikes[1]}/{strikes[0]} {'RKI' if 'RKI' in option_type else ''}"
     else:
         strikes_text = ' / '.join(map(str, strikes))
 
@@ -84,6 +86,7 @@ if st.button('Generate Trade Idea'):
     </p>
     """
     st.markdown(trade_idea_html, unsafe_allow_html=True)
+
 
 # Sidebar for data entry
 st.sidebar.header("FX Derivative Order Tracker")
