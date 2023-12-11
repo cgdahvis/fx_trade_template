@@ -70,9 +70,8 @@ if st.button('Generate Trade Idea'):
     # Formatting strikes
     if option_type in ['call ERKO', 'put ERKO', 'digi risk reversal']:
         strikes_text = f"{strikes[0]}"
-    elif option_type in ['call spread RKI', 'put spread RKI', 'digi risk reversal']:
-        # Include the additional strike in the text
-        strikes_text = f"{strikes[1]}/{strikes[0]} {'RKI' if 'RKI' in option_type else ''}"
+    elif option_type in ['call spread RKI', 'put spread RKI']:
+        strikes_text = ' / '.join(map(str, strikes[:-1]))
     else:
         strikes_text = ' / '.join(map(str, strikes))
 
