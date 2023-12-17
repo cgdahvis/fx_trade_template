@@ -131,24 +131,21 @@ with tab_clients_prospects:
     if 'client_data' not in st.session_state:
         st.session_state['client_data'] = pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
 
-    # Button to add new client
-    if st.button('Add New Client'):
-        new_client_name = st.text_input("Client Name", key="new_client_name")
-        new_firm = st.text_input("Firm", key="new_firm")
-        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
+    # Form for adding a new client
+    with st.form("Add_Client_Form"):
+        new_client_name = st.text_input("Client Name")
+        new_firm = st.text_input("Firm")
+        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"])
+        submit_button = st.form_submit_button("Submit New Client")
 
-        if st.button('Submit New Client'):
-            # Append the new client data to the DataFrame
-            new_data = {'Client Name': new_client_name, 'Firm': new_firm, 'Potential': new_potential}
-            st.session_state.client_data = st.session_state.client_data.append(new_data, ignore_index=True)
-            # Clear the input fields after submission
-            st.session_state.new_client_name = ""
-            st.session_state.new_firm = ""
-            st.session_state.new_potential = "High (Green)"
+    if submit_button:
+        # Append the new client data to the DataFrame
+        new_data = {'Client Name': new_client_name, 'Firm': new_firm, 'Potential': new_potential}
+        st.session_state.client_data = st.session_state.client_data.append(new_data, ignore_index=True)
 
     # Display the client data
     st.dataframe(st.session_state.client_data.style.applymap(
         lambda x: 'background-color: green' if x == "High (Green)"
-                  else ('background-color: yellow' if x == "Medium (Yellow)" 
-                  else 'background-color: red'), 
+                  else ('background-color: yellow' if x == "Medium (Yellow)"
+                  else 'background-color: red'),
         subset=['Potential']))
