@@ -126,4 +126,15 @@ if st.button("Remove Selected Order"):
 
 with tab_clients_prospects:
     st.title("Clients & Prospects")
-    
+
+    # Option to upload a CSV file containing client data
+    uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
+    if uploaded_file is not None:
+        # Load the uploaded CSV into a DataFrame
+        client_data = pd.read_csv(uploaded_file)
+    else:
+        # Sample DataFrame format - modify as per your actual columns
+        client_data = pd.DataFrame(columns=['Client Name', 'Contact Info', 'Status', 'Notes'])
+
+    # Display the DataFrame as an interactive table
+    st.dataframe(client_data)
