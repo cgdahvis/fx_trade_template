@@ -198,21 +198,26 @@ with tab_clients_prospects:
 
         with col3:
             st.write("Select Client to Edit/Delete:")
-            selected_client = st.selectbox("Client Name", st.session_state.client_data['Client Name'], key="select_client")
+            # Safeguard for empty or uninitialized client data
+            client_names = st.session_state.client_data['Client Name'].tolist() if not st.session_state.client_data.empty else [""]
+            selected_client = st.selectbox("Client Name", client_names, key="select_client")
             delete_button = st.button("Delete Client", key="delete_client")
 
     # Processing Add/Update/Delete
-    if submit_button:
+    if submit_button and new_client_name:
         add_or_update_client(new_client_name, new_firm, new_potential, note)
-    if delete_button:
+    if delete_button and selected_client:
         delete_client(selected_client)
 
     # Client Information Grid
     st.subheader("Client Information")
     st.markdown("<div class='client-grid'>", unsafe_allow_html=True)
-    st.dataframe(st.session_state.client_data.style.applymap(
-        lambda x: 'background-color: lightgreen' if x == "High (Green)"
-                  else ('background-color: lightyellow' if x == "Medium (Yellow)"
-                  else 'background-color: lightcoral'),
-        subset=['Potential']))
+    if not st.session_state.client_data.empty:
+        st.dataframe(st.session_state.client_data.style.applymap(
+            lambda x: 'background-color: lightgreen' if x == "High (Green)"
+                      else ('background-color: lightyellow' if x == "Medium (Yellow)"
+                      else 'background-color: lightcoral'),
+            subset=['Potential']))
+    else:
+        st.write("No client data available.")
     st.markdown("</div>", unsafe_allow_html=True)
