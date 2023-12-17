@@ -190,17 +190,11 @@ with tab_clients_prospects:
         submit_new = st.form_submit_button("Add Client")
 
     if submit_new:
-    # Ensure new_data is a DataFrame
-        new_data = pd.DataFrame([{
-        'Client Name': new_client_name, 
-        'Firm': new_firm, 
-        'Potential': new_potential, 
-        'Notes': note
-    }])
-    
-    # Append new_data to client_data
-    st.session_state.client_data = pd.concat([st.session_state.client_data, new_data], ignore_index=True)
-    save_client_data(st.session_state.client_data)
+        # Convert new_data to a DataFrame
+        new_data_df = pd.DataFrame([new_data])
+        # Concatenate new_data_df with the existing DataFrame
+        st.session_state.client_data = pd.concat([st.session_state.client_data, new_data_df], ignore_index=True)
+        save_client_data(st.session_state.client_data)
 
     # Edit Existing Client Section
     with st.container():
