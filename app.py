@@ -15,6 +15,21 @@ def load_orders():
 # Load orders from the CSV file when the app starts
 order_data = load_orders()
 
+# Function to load clients from a CSV file
+def load_client_data():
+    if os.path.isfile('clients_data.csv'):
+        return pd.read_csv('clients_data.csv')
+    else:
+        return pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
+
+# Function to save clients to a CSV file
+def save_client_data(df):
+    df.to_csv('clients_data.csv', index=False)
+
+# Load client data when the app starts
+if 'client_data' not in st.session_state:
+    st.session_state.client_data = load_client_data()
+
 # Set title
 st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
 
@@ -150,10 +165,6 @@ def add_client_to_data(client_name, firm, potential):
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
-    # Initialize the client_data in session state if it doesn't exist
-    if 'client_data' not in st.session_state:
-        st.session_state['client_data'] = pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
-
     # Form for adding a new client
     with st.form("Add_Client_Form"):
         new_client_name = st.text_input("Client Name", key="new_client_name")
@@ -163,6 +174,7 @@ with tab_clients_prospects:
 
     if submit_button:
         add_client_to_data(new_client_name, new_firm, new_potential)
+        save_client_data(st.session_state.client_data)
 
     # Display the client data
     st.dataframe(st.session_state.client_data.style.applymap(
