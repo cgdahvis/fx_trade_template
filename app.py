@@ -171,50 +171,63 @@ with tab1:
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
-    # Style for a cleaner look
+    # Styling for a cleaner look
     st.markdown("""
     <style>
     .client-grid {font-size: 16px; line-height: 1.5;}
     .stButton>button {margin: 5px 0; width: 100%;}
-    .stTextInput, .stSelectbox {margin-bottom: 10px;}
+    .stTextInput, .stSelectbox, .stTextArea {margin-bottom: 10px;}
     </style>
     """, unsafe_allow_html=True)
 
-    # Manage Client Information Section
+    # Add New Client Section
+    with st.form("new_client_form"):
+        st.subheader("Add New Client")
+        new_client_name = st.text_input("Client Name", key="new_client_name")
+        new_firm = st.text_input("Firm", key="new_firm")
+        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
+        note = st.text_area("Notes", key="new_note")
+        submit_new = st.form_submit_button("Add Client")
+
+    if submit_new:
+        # Logic to add new client to DataFrame
+        new_data = {'Client Name': new_client_name, 'Firm': new_firm, 'Potential': new_potential, 'Notes': note}
+        st.session_state.client_data = st.session_state.client_data.append(new_data, ignore_index=True)
+        save_client_data(st.session_state.client_data)
+
+    # Edit Existing Client Section
     with st.container():
-        st.subheader("Manage Client Information")
-        col1, col2 = st.columns([1, 1])
+        st.subheader("Edit Existing Client")
+        client_names = st.session_state.client_data['Client Name'].tolist()
+        selected_client = st.selectbox("Select Client to Edit", [""] + client_names, key="select_client_edit")
 
-        # Add/Edit Client Information
-        with col1:
-            st.write("Enter or Edit Client Details:")
-            client_names = st.session_state.client_data['Client Name'].tolist() if not st.session_state.client_data.empty else [""]
-            selected_client = st.selectbox("Select Client to Edit (optional)", [""] + client_names, key="edit_client")
-            client_info = st.session_state.client_data[st.session_state.client_data['Client Name'] == selected_client].iloc[0] if selected_client else {}
-            new_client_name = st.text_input("Client Name", value=client_info.get('Client Name', ''), key="new_client_name")
-            new_firm = st.text_input("Firm", value=client_info.get('Firm', ''), key="new_firm")
-            new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], index=["High (Green)", "Medium (Yellow)", "Low (Red)"].index(client_info.get('Potential', "High (Green)")), key="new_potential")
-            note = st.text_area("Notes", value=client_info.get('Notes', ''), key="new_note")
-            submit_button = st.button("Add / Update Client", key="submit_client")
+        if selected_client:
+            client_info = st.session_state.client_data[st.session_state.client_data['Client Name'] == selected_client].iloc[0]
+            with st.form("edit_client_form"):
+                edit_client_name = st.text_input("Client Name", value=client_info['Client Name'], key="edit_client_name")
+                edit_firm = st.text_input("Firm", value=client_info['Firm'], key="edit_firm")
+                edit_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], index=["High (Green)", "Medium (Yellow)", "Low (Red)"].index(client_info['Potential']), key="edit_potential")
+                edit_note = st.text_area("Notes", value=client_info.get('Notes', ''), key="edit_note")
+                submit_edit = st.form_submit_button("Update Client")
 
-        # Delete Client Information
-        with col2:
-            st.write("Remove Client:")
-            delete_client_name = st.selectbox("Select Client to Delete", client_names, key="delete_client_name")
-            delete_button = st.button("Delete Client", key="delete_client")
+        if submit_edit:
+            # Logic to update selected client in DataFrame
+            st.session_state.client_data.loc[st.session_state.client_data['Client Name'] == selected_client, ['Client Name', 'Firm', 'Potential', 'Notes']] = [edit_client_name, edit_firm, edit_potential, edit_note]
+            save_client_data(st.session_state.client_data)
 
-    # Processing Add/Update/Delete
-    if submit_button and new_client_name:
-        add_or_update_client(new_client_name, new_firm, new_potential, note)
-    if delete_button and delete_client_name:
-        delete_client(delete_client_name)
+    # Delete Client Section
+    with st.container():
+        st.subheader("Delete Client")
+        delete_client_name = st.selectbox("Select Client to Delete", [""] + client_names, key="delete_client_select")
+        if st.button("Delete Client", key="delete_client"):
+            # Logic to delete selected client from DataFrame
+            st.session_state.client_data = st.session_state.client_data[st.session_state.client_data['Client Name'] != delete_client_name]
+            save_client_data(st.session_state.client_data)
 
-    # Display Client Information
+    # Display Client Information Grid
     st.subheader("Client Information")
-    st.markdown("<div class='client-grid'>", unsafe_allow_html=True)
     st.dataframe(st.session_state.client_data.style.applymap(
         lambda x: 'background-color: lightgreen' if x == "High (Green)"
                   else ('background-color: lightyellow' if x == "Medium (Yellow)"
                   else 'background-color: lightcoral'),
         subset=['Potential']))
-    st.markdown("</div>", unsafe_allow_html=True)
