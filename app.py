@@ -166,24 +166,34 @@ def add_client_to_data(client_name, firm, potential):
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
+    # Make the grid larger
+    st.markdown("""
+    <style>
+    .dataframe {font-size: 18px;}
+    </style>
+    """, unsafe_allow_html=True)
+
     # Form for adding a new client
-    with st.form("Add_Client_Form"):
-        new_client_name = st.text_input("Client Name", key="new_client_name")
-        new_firm = st.text_input("Firm", key="new_firm")
-        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
-        submit_button = st.form_submit_button("Submit New Client")
+    # ... [Existing form code for adding clients]
 
-    if submit_button:
-        # Directly update the DataFrame in session state
-        new_data = pd.DataFrame([[new_client_name, new_firm, new_potential]], columns=['Client Name', 'Firm', 'Potential'])
-        st.session_state.client_data = pd.concat([st.session_state.client_data, new_data], ignore_index=True)
-
-        # Save the updated client data to the CSV file
+    # Functionality for editing and deleting entries
+    selected_client = st.selectbox("Select a Client to Edit or Delete", st.session_state.client_data['Client Name'])
+    if st.button("Delete Selected Client"):
+        st.session_state.client_data = st.session_state.client_data[st.session_state.client_data['Client Name'] != selected_client]
         save_client_data(st.session_state.client_data)
 
-    # Display the client data
+    # Display the client data in a larger grid
     st.dataframe(st.session_state.client_data.style.applymap(
         lambda x: 'background-color: green' if x == "High (Green)"
                   else ('background-color: yellow' if x == "Medium (Yellow)"
                   else 'background-color: red'),
         subset=['Potential']))
+
+    # Add/Edit Notes
+    st.subheader("Add/Edit Notes for a Client")
+    client_to_edit = st.selectbox("Select a Client", st.session_state.client_data['Client Name'], key='edit_client')
+    existing_note = st.session_state.client_data[st.session_state.client_data['Client Name'] == client_to_edit]['Notes'].iloc[0] if 'Notes' in st.session_state.client_data.columns else ""
+    note = st.text_area("Note", value=existing_note)
+    if st.button("Save Note"):
+        st.session_state.client_data.loc[st.session_state.client_data['Client Name'] == client_to_edit, 'Notes'] = note
+        save_client_data(st.session_state.client_data)
