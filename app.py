@@ -166,34 +166,48 @@ def add_client_to_data(client_name, firm, potential):
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
-    # Make the grid larger
+    # Style for a cleaner look
     st.markdown("""
     <style>
-    .dataframe {font-size: 18px;}
+    .client-grid {font-size: 16px; line-height: 1.5;}
+    .stButton>button {margin: 5px 0; width: 100%;}
+    .stTextInput, .stSelectbox {margin-bottom: 10px;}
     </style>
     """, unsafe_allow_html=True)
 
-    # Form for adding a new client
-    # ... [Existing form code for adding clients]
+    # Client Entry Section
+    with st.container():
+        st.subheader("Add or Edit Client Information")
+        col1, col2, col3 = st.columns([1, 2, 1])
 
-    # Functionality for editing and deleting entries
-    selected_client = st.selectbox("Select a Client to Edit or Delete", st.session_state.client_data['Client Name'])
-    if st.button("Delete Selected Client"):
-        st.session_state.client_data = st.session_state.client_data[st.session_state.client_data['Client Name'] != selected_client]
-        save_client_data(st.session_state.client_data)
+        with col1:
+            st.write("Enter Client Details:")
+            new_client_name = st.text_input("Client Name", key="new_client_name")
+            new_firm = st.text_input("Firm", key="new_firm")
+            new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
+            note = st.text_area("Notes", key="new_note")
 
-    # Display the client data in a larger grid
+        with col2:
+            st.write(" ")  # Spacer
+            submit_button = st.button("Add / Update Client", key="submit_client")
+
+        with col3:
+            st.write("Select Client to Edit/Delete:")
+            selected_client = st.selectbox("Client Name", st.session_state.client_data['Client Name'], key="select_client")
+            delete_button = st.button("Delete Client", key="delete_client")
+
+    # Processing Add/Update/Delete
+    if submit_button:
+        add_or_update_client(new_client_name, new_firm, new_potential, note)
+    if delete_button:
+        delete_client(selected_client)
+
+    # Client Information Grid
+    st.subheader("Client Information")
+    st.markdown("<div class='client-grid'>", unsafe_allow_html=True)
     st.dataframe(st.session_state.client_data.style.applymap(
-        lambda x: 'background-color: green' if x == "High (Green)"
-                  else ('background-color: yellow' if x == "Medium (Yellow)"
-                  else 'background-color: red'),
+        lambda x: 'background-color: lightgreen' if x == "High (Green)"
+                  else ('background-color: lightyellow' if x == "Medium (Yellow)"
+                  else 'background-color: lightcoral'),
         subset=['Potential']))
-
-    # Add/Edit Notes
-    st.subheader("Add/Edit Notes for a Client")
-    client_to_edit = st.selectbox("Select a Client", st.session_state.client_data['Client Name'], key='edit_client')
-    existing_note = st.session_state.client_data[st.session_state.client_data['Client Name'] == client_to_edit]['Notes'].iloc[0] if 'Notes' in st.session_state.client_data.columns else ""
-    note = st.text_area("Note", value=existing_note)
-    if st.button("Save Note"):
-        st.session_state.client_data.loc[st.session_state.client_data['Client Name'] == client_to_edit, 'Notes'] = note
-        save_client_data(st.session_state.client_data)
+    st.markdown("</div>", unsafe_allow_html=True)
