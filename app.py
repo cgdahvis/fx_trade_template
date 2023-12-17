@@ -127,14 +127,28 @@ with tab1:
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
-    # Option to upload a CSV file containing client data
-    uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
-    if uploaded_file is not None:
-        # Load the uploaded CSV into a DataFrame
-        client_data = pd.read_csv(uploaded_file)
-    else:
-        # Sample DataFrame format - modify as per your actual columns
-        client_data = pd.DataFrame(columns=['Client Name', 'Contact Info', 'Status', 'Notes'])
+    # Initialize session state variables if they don't exist
+    if 'client_data' not in st.session_state:
+        st.session_state.client_data = pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
+    if 'add_client' not in st.session_state:
+        st.session_state.add_client = False
 
-    # Display the DataFrame as an interactive table
-    st.dataframe(client_data)
+    # Button to add new client
+    if st.button('Add New Client'):
+        st.session_state.add_client = True
+
+    # Input fields for adding a new client
+    if st.session_state.add_client:
+        with st.form("new_client_form", clear_on_submit=True):
+            new_client_name = st.text_input("Client Name")
+            new_firm = st.text_input("Firm")
+            new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"])
+            submitted = st.form_submit_button("Add Client")
+            if submitted:
+                # Add the new client data to the DataFrame
+                new_data = {'Client Name': new_client_name, 'Firm': new_firm, 'Potential': new_potential}
+                st.session_state.client_data = st.session_state.client_data.append(new_data, ignore_index=True)
+                st.session_state.add_client = False
+
+    # Display the client data
+    st.dataframe(st.session_state.client_data.style.applymap(lambda x: 'background-color: green' if x == "High (Green)" else ('background-color: yellow' if x == "Medium (Yellow)" else 'background-color: red'), subset=['Potential']))
