@@ -154,14 +154,19 @@ def add_client_form():
 #---client tab below---
 
 
-def add_client_to_data(client_name, firm, potential):
-    # Function to add a new client to the DataFrame
-    if 'client_data' in st.session_state:
-        new_data = pd.DataFrame([[client_name, firm, potential]], columns=['Client Name', 'Firm', 'Potential'])
-        st.session_state.client_data = pd.concat([st.session_state.client_data, new_data], ignore_index=True)
+def add_or_update_client(client_name, firm, potential, note):
+    if client_name in st.session_state.client_data['Client Name'].values:
+        # Update existing client
+        st.session_state.client_data.loc[st.session_state.client_data['Client Name'] == client_name, ['Firm', 'Potential', 'Notes']] = [firm, potential, note]
     else:
-        # Initialize the DataFrame if it doesn't exist
-        st.session_state.client_data = pd.DataFrame([[client_name, firm, potential]], columns=['Client Name', 'Firm', 'Potential'])
+        # Add new client
+        new_data = pd.DataFrame([[client_name, firm, potential, note]], columns=['Client Name', 'Firm', 'Potential', 'Notes'])
+        st.session_state.client_data = pd.concat([st.session_state.client_data, new_data], ignore_index=True)
+    save_client_data(st.session_state.client_data)
+
+def delete_client(client_name):
+    st.session_state.client_data = st.session_state.client_data[st.session_state.client_data['Client Name'] != client_name]
+    save_client_data(st.session_state.client_data)
 
 with tab_clients_prospects:
     st.title("Clients & Prospects")
