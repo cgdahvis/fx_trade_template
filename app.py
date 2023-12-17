@@ -23,7 +23,6 @@ tab1, tab_clients_prospects = st.tabs(["Trade Idea Generator", "Clients & Prospe
 
 with tab1:
     st.title('Trade Idea Generator')
-    st.title('Trade Idea Generator')
 
 # Create columns for input widgets
 col1, col2, col3 = st.columns([1, 1, 1])
