@@ -173,7 +173,11 @@ with tab_clients_prospects:
         submit_button = st.form_submit_button("Submit New Client")
 
     if submit_button:
-        add_client_to_data(new_client_name, new_firm, new_potential)
+        # Directly update the DataFrame in session state
+        new_data = pd.DataFrame([[new_client_name, new_firm, new_potential]], columns=['Client Name', 'Firm', 'Potential'])
+        st.session_state.client_data = pd.concat([st.session_state.client_data, new_data], ignore_index=True)
+
+        # Save the updated client data to the CSV file
         save_client_data(st.session_state.client_data)
 
     # Display the client data
