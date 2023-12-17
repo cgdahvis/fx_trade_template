@@ -17,7 +17,13 @@ order_data = load_orders()
 
 # Set title
 st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
-st.title('Trade Idea Generator')
+
+# Create Tabs
+tab1, tab_clients_prospects = st.tabs(["Trade Idea Generator", "Clients & Prospects"])
+
+with tab1:
+    st.title('Trade Idea Generator')
+    st.title('Trade Idea Generator')
 
 # Create columns for input widgets
 col1, col2, col3 = st.columns([1, 1, 1])
@@ -117,3 +123,8 @@ if st.button("Remove Selected Order"):
     order_data = order_data[order_data['Client Name'] != order_to_remove]
     save_orders(order_data)
     st.success(f"Order for {order_to_remove} Removed!")
+
+
+with tab_clients_prospects:
+    st.title("Clients & Prospects")
+    
