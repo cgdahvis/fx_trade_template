@@ -182,42 +182,33 @@ with tab_clients_prospects:
 
     # Client Entry Section
     with st.container():
-        st.subheader("Add or Edit Client Information")
+        st.subheader("Manage Client Information")
         col1, col2, col3 = st.columns([1, 2, 1])
 
         with col1:
-            st.write("Enter Client Details:")
-            new_client_name = st.text_input("Client Name", key="new_client_name")
-            new_firm = st.text_input("Firm", key="new_firm")
-            new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
-            note = st.text_area("Notes", key="new_note")
+            st.write("Enter or Edit Client Details:")
+            client_names = st.session_state.client_data['Client Name'].tolist() if not st.session_state.client_data.empty else [""]
+            selected_client = st.selectbox("Select Client to Edit", client_names, key="edit_client")
+            
+            # Pre-populate fields if a client is selected
+            if selected_client:
+                client_info = st.session_state.client_data[st.session_state.client_data['Client Name'] == selected_client].iloc[0]
+                new_client_name = st.text_input("Client Name", value=client_info['Client Name'], key="new_client_name")
+                new_firm = st.text_input("Firm", value=client_info['Firm'], key="new_firm")
+                new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], index=["High (Green)", "Medium (Yellow)", "Low (Red)"].index(client_info['Potential']), key="new_potential")
+                note = st.text_area("Notes", value=client_info.get('Notes', ''), key="new_note")
 
         with col2:
             st.write(" ")  # Spacer
-            submit_button = st.button("Add / Update Client", key="submit_client")
+            submit_button = st.button("Update Client", key="submit_client")
 
         with col3:
-            st.write("Select Client to Edit/Delete:")
-            # Safeguard for empty or uninitialized client data
-            client_names = st.session_state.client_data['Client Name'].tolist() if not st.session_state.client_data.empty else [""]
-            selected_client = st.selectbox("Client Name", client_names, key="select_client")
+            st.write("Remove Client:")
+            delete_client_name = st.selectbox("Select Client to Delete", client_names, key="delete_client_name")
             delete_button = st.button("Delete Client", key="delete_client")
 
-    # Processing Add/Update/Delete
+    # Update or delete client information
     if submit_button and new_client_name:
-        add_or_update_client(new_client_name, new_firm, new_potential, note)
-    if delete_button and selected_client:
-        delete_client(selected_client)
-
-    # Client Information Grid
-    st.subheader("Client Information")
-    st.markdown("<div class='client-grid'>", unsafe_allow_html=True)
-    if not st.session_state.client_data.empty:
-        st.dataframe(st.session_state.client_data.style.applymap(
-            lambda x: 'background-color: lightgreen' if x == "High (Green)"
-                      else ('background-color: lightyellow' if x == "Medium (Yellow)"
-                      else 'background-color: lightcoral'),
-            subset=['Potential']))
-    else:
-        st.write("No client data available.")
-    st.markdown("</div>", unsafe_allow_html=True)
+        update_client_data(selected_client, new_client_name, new_firm, new_potential, note)
+    if delete_button and delete_client_name:
+        delete_client(delete_client_name)
