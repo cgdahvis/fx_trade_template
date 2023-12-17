@@ -127,21 +127,33 @@ with tab1:
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
+    # Initialize session state for client form if not already done
+    if 'new_client_name' not in st.session_state:
+        st.session_state.new_client_name = ''
+    if 'new_firm' not in st.session_state:
+        st.session_state.new_firm = ''
+    if 'new_potential' not in st.session_state:
+        st.session_state.new_potential = 'High (Green)'
+
     # Initialize the client_data in session state if it doesn't exist
     if 'client_data' not in st.session_state:
         st.session_state['client_data'] = pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
 
     # Form for adding a new client
     with st.form("Add_Client_Form"):
-        new_client_name = st.text_input("Client Name")
-        new_firm = st.text_input("Firm")
-        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"])
+        new_client_name = st.text_input("Client Name", value=st.session_state.new_client_name)
+        new_firm = st.text_input("Firm", value=st.session_state.new_firm)
+        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], index=["High (Green)", "Medium (Yellow)", "Low (Red)"].index(st.session_state.new_potential))
         submit_button = st.form_submit_button("Submit New Client")
 
     if submit_button:
         # Append the new client data to the DataFrame
         new_data = {'Client Name': new_client_name, 'Firm': new_firm, 'Potential': new_potential}
         st.session_state.client_data = st.session_state.client_data.append(new_data, ignore_index=True)
+        # Reset the input fields
+        st.session_state.new_client_name = ''
+        st.session_state.new_firm = ''
+        st.session_state.new_potential = 'High (Green)'
 
     # Display the client data
     st.dataframe(st.session_state.client_data.style.applymap(
