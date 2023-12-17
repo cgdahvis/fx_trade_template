@@ -135,6 +135,18 @@ def add_client_form():
         else:
             return False
 
+#---client tab below---
+
+
+def add_client_to_data(client_name, firm, potential):
+    # Function to add a new client to the DataFrame
+    if 'client_data' in st.session_state:
+        new_data = pd.DataFrame([[client_name, firm, potential]], columns=['Client Name', 'Firm', 'Potential'])
+        st.session_state.client_data = pd.concat([st.session_state.client_data, new_data], ignore_index=True)
+    else:
+        # Initialize the DataFrame if it doesn't exist
+        st.session_state.client_data = pd.DataFrame([[client_name, firm, potential]], columns=['Client Name', 'Firm', 'Potential'])
+
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
@@ -142,21 +154,15 @@ with tab_clients_prospects:
     if 'client_data' not in st.session_state:
         st.session_state['client_data'] = pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
 
-    # Button to open the modal for adding a new client
-    if st.button('Add New Client'):
-        st.experimental_set_query_params(add_client='true')
+    # Form for adding a new client
+    with st.form("Add_Client_Form"):
+        new_client_name = st.text_input("Client Name", key="new_client_name")
+        new_firm = st.text_input("Firm", key="new_firm")
+        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
+        submit_button = st.form_submit_button("Submit New Client")
 
-    # Check if the add client modal should be open
-    query_params = st.experimental_get_query_params()
-    if query_params.get('add_client') == ['true']:
-        if add_client_form():
-            # Append the new client data to the DataFrame
-            new_data = {'Client Name': st.session_state.new_client_name,
-                        'Firm': st.session_state.new_firm,
-                        'Potential': st.session_state.new_potential}
-            st.session_state.client_data = st.session_state.client_data.append(new_data, ignore_index=True)
-            # Clear the query params
-            st.experimental_set_query_params(add_client=None)
+    if submit_button:
+        add_client_to_data(new_client_name, new_firm, new_potential)
 
     # Display the client data
     st.dataframe(st.session_state.client_data.style.applymap(
