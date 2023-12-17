@@ -191,7 +191,7 @@ with tab_clients_prospects:
 
     if submit_new:
     # Ensure new_data is a DataFrame
-    new_data = pd.DataFrame([{
+        new_data = pd.DataFrame([{
         'Client Name': new_client_name, 
         'Firm': new_firm, 
         'Potential': new_potential, 
