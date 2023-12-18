@@ -199,10 +199,10 @@ with tab_clients_prospects:
     if submit_new or submit_edit or delete_button:
         if submit_new:
             # Logic to add new client
-        elif submit_edit:
-            # Logic to update selected client
-        elif delete_button:
-            # Logic to delete selected client
+            elif submit_edit:
+                # Logic to update selected client
+            elif delete_button:
+                # Logic to delete selected client
 
         # Save changes to Google Sheet
         update_google_sheet(st.session_state.client_data)
