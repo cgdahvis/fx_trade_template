@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 
-
 # Function to save orders to a CSV file
 def save_orders(order_data):
     order_data.to_csv("orders.csv", index=False)
@@ -145,13 +144,6 @@ with tab1:
         save_orders(order_data)
         st.success(f"Order for {order_to_remove} Removed!")
 
-#---client tab below---
 
-with tab_clients_prospects:
-    st.title("Clients & Prospects")
-
-    df = conn.read(
-        worksheet="chats"
-    )
 
 # Print results.
