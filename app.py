@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import gspread
+from streamlit_gsheets import GSheetsConnection
 from oauth2client.service_account import ServiceAccountCredentials
 
 # Function to save orders to a CSV file
@@ -33,26 +33,8 @@ order_data = load_orders()
 #     st.session_state.client_data = load_client_data()
 
 #------Google Sheet----
-# Initialize GSpread client
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("path_to_your_credentials.json", scope)
-gc = gspread.authorize(creds)
-
-# Open the Google Sheet
-sheet = gc.open("Your_Sheet_Name").sheet1
-
-# Function to load data from Google Sheet
-def load_google_sheet_data():
-    return pd.DataFrame(sheet.get_all_records())
-
-# Function to update Google Sheet
-def update_google_sheet(df):
-    # Clear the existing data
-    sheet.clear()
-    # Update with the new DataFrame
-    sheet.update([df.columns.values.tolist()] + df.values.tolist())
-# Load client data from Google Sheet
-st.session_state.client_data = load_google_sheet_data()
+# Initialize GSpread client  # Create a connection object.
+conn = st.connection("gsheets", type=GSheetsConnection)
 #------END Google Sheet----
 
 # Set title
@@ -165,48 +147,11 @@ with tab1:
 
 #---client tab below---
 
-# def add_client_form():
-#     # Function to display the form in a modal
-#     with st.form("Add_Client_Form", clear_on_submit=True):
-#         st.text_input("Client Name", key="new_client_name")
-#         st.text_input("Firm", key="new_firm")
-#         st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
-#         submit_button = st.form_submit_button("Submit New Client")
-#         if submit_button:
-#             return True
-#         else:
-#             return False
-
-
-# def add_or_update_client(client_name, firm, potential, note):
-#     if client_name in st.session_state.client_data['Client Name'].values:
-#         # Update existing client
-#         st.session_state.client_data.loc[st.session_state.client_data['Client Name'] == client_name, ['Firm', 'Potential', 'Notes']] = [firm, potential, note]
-#     else:
-#         # Add new client
-#         new_data = pd.DataFrame([[client_name, firm, potential, note]], columns=['Client Name', 'Firm', 'Potential', 'Notes'])
-#         st.session_state.client_data = pd.concat([st.session_state.client_data, new_data], ignore_index=True)
-#     save_client_data(st.session_state.client_data)
-
-# def delete_client(client_name):
-#     st.session_state.client_data = st.session_state.client_data[st.session_state.client_data['Client Name'] != client_name]
-#     save_client_data(st.session_state.client_data)
-
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
-    # Add / Edit / Delete client information
-    if submit_new or submit_edit or delete_button:
-        if submit_new:
-            # Logic to add new client
-            elif submit_edit:
-                # Logic to update selected client
-            elif delete_button:
-                # Logic to delete selected client
+    df = conn.read(
+        worksheet="chats"
+    )
 
-        # Save changes to Google Sheet
-        update_google_sheet(st.session_state.client_data)
-
-        # Display Client Information
-        st.subheader("Client Information")
-        st.dataframe(st.session_state.client_data)
+# Print results.
