@@ -207,6 +207,6 @@ with tab_clients_prospects:
         # Save changes to Google Sheet
         update_google_sheet(st.session_state.client_data)
 
-    # Display Client Information
-    st.subheader("Client Information")
-    st.dataframe(st.session_state.client_data)
+        # Display Client Information
+        st.subheader("Client Information")
+        st.dataframe(st.session_state.client_data)
