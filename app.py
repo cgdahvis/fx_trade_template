@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Function to save orders to a CSV file
 def save_orders(order_data):
@@ -16,20 +17,43 @@ def load_orders():
 # Load orders from the CSV file when the app starts
 order_data = load_orders()
 
-# Function to load clients from a CSV file
-def load_client_data():
-    if os.path.isfile('clients_data.csv'):
-        return pd.read_csv('clients_data.csv')
-    else:
-        return pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
+# # Function to load clients from a CSV file
+# def load_client_data():
+#     if os.path.isfile('clients_data.csv'):
+#         return pd.read_csv('clients_data.csv')
+#     else:
+#         return pd.DataFrame(columns=['Client Name', 'Firm', 'Potential'])
 
-# Function to save clients to a CSV file
-def save_client_data(df):
-    df.to_csv('clients_data.csv', index=False)
+# # Function to save clients to a CSV file
+# def save_client_data(df):
+#     df.to_csv('clients_data.csv', index=False)
 
-# Load client data when the app starts
-if 'client_data' not in st.session_state:
-    st.session_state.client_data = load_client_data()
+# # Load client data when the app starts
+# if 'client_data' not in st.session_state:
+#     st.session_state.client_data = load_client_data()
+
+#------Google Sheet----
+# Initialize GSpread client
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("path_to_your_credentials.json", scope)
+gc = gspread.authorize(creds)
+
+# Open the Google Sheet
+sheet = gc.open("Your_Sheet_Name").sheet1
+
+# Function to load data from Google Sheet
+def load_google_sheet_data():
+    return pd.DataFrame(sheet.get_all_records())
+
+# Function to update Google Sheet
+def update_google_sheet(df):
+    # Clear the existing data
+    sheet.clear()
+    # Update with the new DataFrame
+    sheet.update([df.columns.values.tolist()] + df.values.tolist())
+# Load client data from Google Sheet
+st.session_state.client_data = load_google_sheet_data()
+#------END Google Sheet----
 
 # Set title
 st.set_page_config(page_title="Trade Idea Generator", page_icon=":chart_with_upwards_trend:", layout="wide")
@@ -171,64 +195,18 @@ with tab1:
 with tab_clients_prospects:
     st.title("Clients & Prospects")
 
-    # Styling for a cleaner look
-    st.markdown("""
-    <style>
-    .client-grid {font-size: 16px; line-height: 1.5;}
-    .stButton>button {margin: 5px 0; width: 100%;}
-    .stTextInput, .stSelectbox, .stTextArea {margin-bottom: 10px;}
-    </style>
-    """, unsafe_allow_html=True)
+    # Add / Edit / Delete client information
+    if submit_new or submit_edit or delete_button:
+        if submit_new:
+            # Logic to add new client
+        elif submit_edit:
+            # Logic to update selected client
+        elif delete_button:
+            # Logic to delete selected client
 
-    # Add New Client Section
-    with st.form("new_client_form"):
-        st.subheader("Add New Client")
-        new_client_name = st.text_input("Client Name", key="new_client_name")
-        new_firm = st.text_input("Firm", key="new_firm")
-        new_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], key="new_potential")
-        note = st.text_area("Notes", key="new_note")
-        submit_new = st.form_submit_button("Add Client")
+        # Save changes to Google Sheet
+        update_google_sheet(st.session_state.client_data)
 
-    if submit_new:
-        # Convert new_data to a DataFrame
-        new_data_df = pd.DataFrame([new_data])
-        # Concatenate new_data_df with the existing DataFrame
-        st.session_state.client_data = pd.concat([st.session_state.client_data, new_data_df], ignore_index=True)
-        save_client_data(st.session_state.client_data)
-
-    # Edit Existing Client Section
-    with st.container():
-        st.subheader("Edit Existing Client")
-        client_names = st.session_state.client_data['Client Name'].tolist()
-        selected_client = st.selectbox("Select Client to Edit", [""] + client_names, key="select_client_edit")
-
-        if selected_client:
-            client_info = st.session_state.client_data[st.session_state.client_data['Client Name'] == selected_client].iloc[0]
-            with st.form("edit_client_form"):
-                edit_client_name = st.text_input("Client Name", value=client_info['Client Name'], key="edit_client_name")
-                edit_firm = st.text_input("Firm", value=client_info['Firm'], key="edit_firm")
-                edit_potential = st.selectbox("Potential", ["High (Green)", "Medium (Yellow)", "Low (Red)"], index=["High (Green)", "Medium (Yellow)", "Low (Red)"].index(client_info['Potential']), key="edit_potential")
-                edit_note = st.text_area("Notes", value=client_info.get('Notes', ''), key="edit_note")
-                submit_edit = st.form_submit_button("Update Client")
-
-        if submit_edit:
-            # Logic to update selected client in DataFrame
-            st.session_state.client_data.loc[st.session_state.client_data['Client Name'] == selected_client, ['Client Name', 'Firm', 'Potential', 'Notes']] = [edit_client_name, edit_firm, edit_potential, edit_note]
-            save_client_data(st.session_state.client_data)
-
-    # Delete Client Section
-    with st.container():
-        st.subheader("Delete Client")
-        delete_client_name = st.selectbox("Select Client to Delete", [""] + client_names, key="delete_client_select")
-        if st.button("Delete Client", key="delete_client"):
-            # Logic to delete selected client from DataFrame
-            st.session_state.client_data = st.session_state.client_data[st.session_state.client_data['Client Name'] != delete_client_name]
-            save_client_data(st.session_state.client_data)
-
-    # Display Client Information Grid
+    # Display Client Information
     st.subheader("Client Information")
-    st.dataframe(st.session_state.client_data.style.applymap(
-        lambda x: 'background-color: lightgreen' if x == "High (Green)"
-                  else ('background-color: lightyellow' if x == "Medium (Yellow)"
-                  else 'background-color: lightcoral'),
-        subset=['Potential']))
+    st.dataframe(st.session_state.client_data)
